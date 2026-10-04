@@ -33,7 +33,9 @@ export default function MyIssuesScreen() {
 
   const pendingCount = myIssues.filter((i) => i.status === "Pending").length;
   const inProgressCount = myIssues.filter((i) => i.status === "In Progress").length;
-  const completedCount = myIssues.filter((i) => i.status === "Completed").length;
+  const completedCount = myIssues.filter(
+    (i) => i.status === "Completed" || i.status === "Resolved"
+  ).length;
 
   return (
     <div className="my-issues-container">

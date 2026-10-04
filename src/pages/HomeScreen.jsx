@@ -11,7 +11,9 @@ export default function HomeScreen() {
 
   const totalCount = issues.length;
   const inProgressCount = issues.filter((i) => i.status === "In Progress").length;
-  const resolvedCount = issues.filter((i) => i.status === "Completed").length;
+  const resolvedCount = issues.filter(
+    (i) => i.status === "Completed" || i.status === "Resolved"
+  ).length;
 
   return (
     <div className="home-screen-container">

@@ -29,7 +29,9 @@ export default function IssueListScreen() {
       // Status filter
       const matchesStatus =
         selectedStatus === "All" ||
-        issue.status.toLowerCase() === selectedStatus.toLowerCase();
+        issue.status.toLowerCase() === selectedStatus.toLowerCase() ||
+        (selectedStatus.toLowerCase() === "completed" && issue.status.toLowerCase() === "resolved") ||
+        (selectedStatus.toLowerCase() === "resolved" && issue.status.toLowerCase() === "completed");
 
       // Search term
       const matchesSearch =
