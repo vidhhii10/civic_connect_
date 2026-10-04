@@ -14,10 +14,31 @@ export function IssueProvider({ children }) {
     setLoading(false);
   }, []);
 
-  // Add an issue
+  // Add an issue — persists locally, then fires n8n webhook (non-blocking)
   const addIssue = (newIssueData) => {
     const created = issueService.addIssue(newIssueData);
     setIssues((prev) => [created, ...prev]);
+
+    // Fire-and-forget: POST to n8n automation webhook
+    // Network failures are logged but never block the citizen submission
+    fetch("https://vidhisp1010.app.n8n.cloud/webhook/submit-issue", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(created),
+    })
+      .then((res) => {
+        if (!res.ok) {
+          console.warn("[n8n webhook] Non-OK response:", res.status, res.statusText);
+        }
+        return res.json().catch(() => null); // some n8n flows return empty body
+      })
+      .then((data) => {
+        if (data) console.info("[n8n webhook] Acknowledged:", data);
+      })
+      .catch((err) => {
+        console.warn("[n8n webhook] Network error (issue saved locally):", err);
+      });
+
     return created;
   };
 
