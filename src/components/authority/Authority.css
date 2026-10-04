@@ -1,0 +1,414 @@
+/* Civic Connect - Authority / Admin Portal Design System */
+
+.authority-shell {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  background-color: #0b0c0e;
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* ==========================================================================
+   Authority Sidebar
+   ========================================================================== */
+.authority-sidebar {
+  width: 260px;
+  min-width: 260px;
+  background-color: #141518;
+  border-right: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.authority-sidebar-brand {
+  padding: 20px 20px 16px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.authority-logo-icon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #2f6783 0%, #1e4254 100%);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #38bdf8;
+  box-shadow: 0 4px 12px rgba(47, 103, 131, 0.3);
+}
+
+.authority-brand-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.authority-brand-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+}
+
+.authority-portal-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.authority-sidebar-nav {
+  flex: 1;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+}
+
+.authority-nav-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-muted);
+  padding: 10px 12px 6px 12px;
+}
+
+.authority-nav-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.15s ease;
+}
+
+.authority-nav-link-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.authority-nav-link:hover:not(.disabled) {
+  background-color: rgba(255, 255, 255, 0.04);
+  color: #ffffff;
+}
+
+.authority-nav-link.active {
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--accent-cyan);
+  font-weight: 600;
+  border-left: 3px solid var(--accent-cyan);
+}
+
+.authority-nav-link.disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.soon-pill {
+  font-size: 10px;
+  font-weight: 600;
+  background-color: rgba(255, 255, 255, 0.08);
+  color: var(--text-muted);
+  padding: 2px 6px;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.authority-sidebar-footer {
+  padding: 16px;
+  border-top: 1px solid var(--border-subtle);
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+.authority-officer-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.officer-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #22262e;
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-cyan);
+}
+
+.officer-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.officer-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.officer-status-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.online-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: var(--status-completed);
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.8);
+}
+
+/* ==========================================================================
+   Authority Main & Header
+   ========================================================================== */
+.authority-main-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 100vh;
+  background-color: #0e0f12;
+}
+
+.authority-header {
+  height: 64px;
+  background-color: #141518;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.authority-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.authority-mobile-menu-btn {
+  display: none;
+  background: none;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 6px;
+  color: #ffffff;
+  cursor: pointer;
+}
+
+.authority-header-title-box h1 {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.2px;
+}
+
+.authority-header-title-box p {
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.2;
+}
+
+.authority-header-right {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.authority-jurisdiction-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(47, 103, 131, 0.2);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 6px 12px;
+  border-radius: 9999px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--accent-cyan);
+}
+
+/* ==========================================================================
+   Authority Content Body
+   ========================================================================== */
+.authority-content-body {
+  flex: 1;
+  padding: 28px;
+  max-width: 1500px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+/* ==========================================================================
+   Stat KPI Cards
+   ========================================================================== */
+.authority-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.authority-kpi-card {
+  background-color: #17191d;
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.authority-kpi-card:hover {
+  border-color: rgba(255, 255, 255, 0.14);
+  transform: translateY(-2px);
+}
+
+.kpi-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.kpi-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.kpi-value {
+  font-size: 28px;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.1;
+}
+
+.kpi-subtext {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+.kpi-icon-box {
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.kpi-icon-total {
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(56, 189, 248, 0.2);
+}
+
+.kpi-icon-pending {
+  background: var(--status-pending-bg);
+  color: var(--status-pending);
+  border: 1px solid var(--status-pending-border);
+}
+
+.kpi-icon-progress {
+  background: var(--status-progress-bg);
+  color: var(--status-progress);
+  border: 1px solid var(--status-progress-border);
+}
+
+.kpi-icon-completed {
+  background: var(--status-completed-bg);
+  color: var(--status-completed);
+  border: 1px solid var(--status-completed-border);
+}
+
+.kpi-icon-rate {
+  background: rgba(168, 85, 247, 0.12);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.25);
+}
+
+/* ==========================================================================
+   Mobile Overlay
+   ========================================================================== */
+.authority-sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(3px);
+  z-index: 45;
+}
+
+/* ==========================================================================
+   Responsive Breakpoints
+   ========================================================================== */
+@media (max-width: 900px) {
+  .authority-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    transform: translateX(-100%);
+  }
+
+  .authority-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .authority-sidebar-overlay.active {
+    display: block;
+  }
+
+  .authority-mobile-menu-btn {
+    display: inline-flex;
+  }
+
+  .authority-header {
+    padding: 0 16px;
+  }
+
+  .authority-content-body {
+    padding: 16px;
+  }
+
+  .authority-jurisdiction-badge {
+    display: none;
+  }
+}

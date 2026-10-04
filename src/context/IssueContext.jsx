@@ -21,6 +21,17 @@ export function IssueProvider({ children }) {
     return created;
   };
 
+  // Update an issue
+  const updateIssue = (id, updates) => {
+    const updated = issueService.updateIssue(id, updates);
+    if (updated) {
+      setIssues((prev) =>
+        prev.map((issue) => (issue.id === id ? { ...issue, ...updates } : issue))
+      );
+    }
+    return updated;
+  };
+
   // Reset to initial issues
   const resetToSeed = () => {
     const seeded = issueService.resetData();
@@ -33,6 +44,7 @@ export function IssueProvider({ children }) {
         issues,
         loading,
         addIssue,
+        updateIssue,
         resetToSeed
       }}
     >
