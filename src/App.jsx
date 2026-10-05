@@ -22,6 +22,7 @@ import IssueReportingScreen from "./pages/IssueReportingScreen";
 import IssueListScreen from "./pages/IssueListScreen";
 import MyIssuesScreen from "./pages/MyIssuesScreen";
 import UsersScreen from "./pages/UsersScreen";
+import LoginScreen from "./pages/LoginScreen";
 
 // Authority Components & Pages
 import AuthorityLayout from "./components/authority/AuthorityLayout";
@@ -65,9 +66,12 @@ export default function App() {
       <UserProvider>
         <IssueProvider>
           <Routes>
+
+            {/* Citizen Authentication */}
+            <Route path="/" element={<LoginScreen />} />
+
             {/* Citizen Routes - mobile-first shell */}
-            <Route element={<CitizenLayout />}>
-              <Route path="/" element={<Navigate to="/home" replace />} />
+             <Route element={<CitizenLayout />}>
               <Route path="/home" element={<HomeScreen />} />
               <Route path="/map" element={<IssueMapScreen />} />
               <Route path="/report" element={<IssueReportingScreen />} />
@@ -75,6 +79,10 @@ export default function App() {
               <Route path="/my-issues" element={<MyIssuesScreen />} />
               <Route path="/users" element={<UsersScreen />} />
             </Route>
+
+            {/* Authentication Routes */}
+            <Route path="/login" element={<LoginScreen />} />
+            <Route path="/signup" element={<LoginScreen initialMode="signup" />} />
 
             {/* Authority Routes - full-width desktop command layout */}
             <Route path="/authority" element={<AuthorityLayout />}>

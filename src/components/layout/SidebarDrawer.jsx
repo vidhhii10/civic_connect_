@@ -8,6 +8,7 @@ import {
   LayoutGrid,
   Camera,
   User,
+  LogIn,
   RotateCcw,
   ExternalLink,
   ShieldAlert
@@ -85,6 +86,10 @@ export default function SidebarDrawer({ isOpen, onClose }) {
           <Link to="/users" className="drawer-link" onClick={onClose}>
             <User size={18} />
             <span>Users & Citizens</span>
+          </Link>
+          <Link to="/login" className="drawer-link" onClick={onClose}>
+            <LogIn size={18} />
+            <span>Citizen Sign In</span>
           </Link>
         </nav>
 

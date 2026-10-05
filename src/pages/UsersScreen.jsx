@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { User, Check, Phone, Mail, MapPin, Shield, RefreshCw, UserPlus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { User, Check, Phone, Mail, MapPin, Shield, RefreshCw, UserPlus, LogIn } from "lucide-react";
 import { useUser } from "../context/UserContext";
 import { useIssues } from "../context/IssueContext";
 
 export default function UsersScreen() {
+  const navigate = useNavigate();
   const { currentUser, allUsers, switchUser } = useUser();
   const { issues, resetToSeed } = useIssues();
 
@@ -59,6 +61,26 @@ export default function UsersScreen() {
             <span className="active-user-addr"><MapPin size={12} /> {currentUser.address}</span>
           </div>
         </div>
+      </div>
+
+      {/* Citizen Authentication Portal Card */}
+      <div className="card" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", border: "1px solid rgba(56, 189, 248, 0.25)", background: "linear-gradient(135deg, rgba(31, 33, 37, 0.9) 0%, rgba(47, 103, 131, 0.15) 100%)" }}>
+        <div>
+          <h4 style={{ fontSize: "14px", fontWeight: "700", color: "#ffffff", marginBottom: "2px" }}>
+            Citizen Login & Registration
+          </h4>
+          <p style={{ fontSize: "12px", color: "var(--text-secondary)" }}>
+            Authenticate with password, test validation, or register a new citizen profile.
+          </p>
+        </div>
+        <button
+          className="btn btn-primary"
+          style={{ padding: "8px 14px", fontSize: "13px", whiteSpace: "nowrap" }}
+          onClick={() => navigate("/login")}
+        >
+          <LogIn size={15} />
+          <span>Open Login</span>
+        </button>
       </div>
 
       {/* Available Citizen Switcher List */}
