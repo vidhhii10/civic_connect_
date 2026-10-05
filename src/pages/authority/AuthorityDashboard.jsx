@@ -17,16 +17,21 @@ import AuthorityStatCard from "../../components/authority/AuthorityStatCard";
 import StatusBadge from "../../components/common/StatusBadge";
 import AuthorityIssueModal from "../../components/authority/AuthorityIssueModal";
 import { ISSUE_CATEGORIES } from "../../services/seedData";
+import { useUser } from "../../context/UserContext";
 
 export default function AuthorityDashboard() {
   const { issues } = useIssues();
+  const { currentUser } = useUser();
+  const visibleIssues = currentUser?.authorityRole === "field_officer"
+    ? issues.filter((issue) => issue.assignedOfficer === currentUser.name)
+    : issues;
   const [selectedIssueId, setSelectedIssueId] = useState(null);
 
   // Dynamic KPI Calculations
-  const totalCount = issues.length;
-  const pendingCount = issues.filter((i) => i.status === "Pending").length;
-  const inProgressCount = issues.filter((i) => i.status === "In Progress").length;
-  const completedCount = issues.filter(
+  const totalCount = visibleIssues.length;
+  const pendingCount = visibleIssues.filter((i) => i.status === "Pending").length;
+  const inProgressCount = visibleIssues.filter((i) => i.status === "In Progress").length;
+  const completedCount = visibleIssues.filter(
     (i) => i.status === "Completed" || i.status === "Resolved"
   ).length;
   const completionRate = totalCount
@@ -34,8 +39,8 @@ export default function AuthorityDashboard() {
     : 0;
 
   // Priority Attention Issues: Pending or In-Progress issues, prioritizing critical categories
-  const attentionIssues = [...issues]
-    .filter((i) => i.status === "Pending" || i.status === "In Progress")
+  const attentionIssues = [...visibleIssues]
+    .filter((i) => ["Pending", "Assigned", "In Progress", "Pending Verification", "Rework Required"].includes(i.status))
     .sort((a, b) => {
       // Prioritize urgent categories
       const urgentCats = ["Exposed Wires", "Water Leakage", "Pothole"];
@@ -49,11 +54,11 @@ export default function AuthorityDashboard() {
   // Category Workload Breakdown
   // Combine all categories present in issues and seed categories
   const allCategories = Array.from(
-    new Set([...ISSUE_CATEGORIES, ...issues.map((i) => i.category)])
+    new Set([...ISSUE_CATEGORIES, ...visibleIssues.map((i) => i.category)])
   );
 
   const categoryWorkload = allCategories.map((cat) => {
-    const catIssues = issues.filter((i) => i.category === cat);
+    const catIssues = visibleIssues.filter((i) => i.category === cat);
     const count = catIssues.length;
     const pendingInCat = catIssues.filter((i) => i.status === "Pending").length;
     const percentOfTotal = totalCount ? Math.round((count / totalCount) * 100) : 0;
@@ -66,7 +71,7 @@ export default function AuthorityDashboard() {
   }).filter((item) => item.count > 0);
 
   // Recent Submissions (Sorted by timestamp descending)
-  const recentIssues = [...issues]
+  const recentIssues = [...visibleIssues]
     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
     .slice(0, 5);
 
@@ -278,7 +283,7 @@ export default function AuthorityDashboard() {
       {/* Authority Issue Modal */}
       {selectedIssueId && (
         <AuthorityIssueModal
-          issue={issues.find((i) => i.id === selectedIssueId)}
+          issue={visibleIssues.find((i) => i.id === selectedIssueId)}
           onClose={() => setSelectedIssueId(null)}
         />
       )}

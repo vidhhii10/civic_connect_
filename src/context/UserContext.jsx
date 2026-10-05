@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { issueService } from "../services/issueService";
+import { AUTHORITY_DEMO_ACCOUNTS } from "../services/seedData";
 
 const UserContext = createContext();
 
@@ -27,6 +28,19 @@ export function UserProvider({ children }) {
     const trimmed = (identifier || "").trim().toLowerCase();
     if (!trimmed) {
       return { success: false, error: "Please enter your email or username." };
+    }
+
+    const authorityAccount = AUTHORITY_DEMO_ACCOUNTS.find(
+      (account) => account.email === trimmed
+    );
+    if (authorityAccount) {
+      if (authorityAccount.password !== password) {
+        return { success: false, error: "Incorrect authority email or password." };
+      }
+      const user = { ...authorityAccount };
+      delete user.password;
+      switchUser(user);
+      return { success: true, user };
     }
 
     // Match existing user by email or name
@@ -107,9 +121,9 @@ export function UserProvider({ children }) {
   };
 
   const logout = () => {
-    // Reset to first demo citizen
+    issueService.clearActiveUser();
     const defaultUser = issueService.getAllUsers()[0];
-    switchUser(defaultUser);
+    setCurrentUserState(defaultUser);
     return { success: true };
   };
 

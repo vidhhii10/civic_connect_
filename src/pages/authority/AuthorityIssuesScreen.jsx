@@ -6,6 +6,7 @@ import AuthorityIssueCard from "../../components/authority/AuthorityIssueCard";
 import AuthorityIssueModal from "../../components/authority/AuthorityIssueModal";
 import { ISSUE_CATEGORIES, MUNICIPAL_DEPARTMENTS } from "../../services/seedData";
 import { exportIssuesToCSV } from "../../utils/csvExport";
+import { useUser } from "../../context/UserContext";
 
 const PRIORITY_RANK = {
   Critical: 4,
@@ -15,7 +16,11 @@ const PRIORITY_RANK = {
 };
 
 export default function AuthorityIssuesScreen() {
-  const { issues, updateIssue } = useIssues();
+  const { issues } = useIssues();
+  const { currentUser } = useUser();
+  const visibleIssues = currentUser?.authorityRole === "field_officer"
+    ? issues.filter((issue) => issue.assignedOfficer === currentUser.name)
+    : issues;
 
   // Filters & Search & Sort state
   const [searchTerm, setSearchTerm] = useState("");
@@ -29,28 +34,31 @@ export default function AuthorityIssuesScreen() {
 
   // Dynamic category options from issues + seed
   const categoriesList = useMemo(() => {
-    const set = new Set([...ISSUE_CATEGORIES, ...issues.map((i) => i.category)]);
+    const set = new Set([...ISSUE_CATEGORIES, ...visibleIssues.map((i) => i.category)]);
     return ["All", ...Array.from(set)];
-  }, [issues]);
+  }, [visibleIssues]);
 
   // Status counts for tabs
   const statusCounts = useMemo(() => {
     return {
-      All: issues.length,
-      Pending: issues.filter((i) => i.status === "Pending").length,
-      "In Progress": issues.filter((i) => i.status === "In Progress").length,
-      Resolved: issues.filter((i) => i.status === "Resolved" || i.status === "Completed").length,
-      Rejected: issues.filter((i) => i.status === "Rejected").length
+      All: visibleIssues.length,
+      Pending: visibleIssues.filter((i) => i.status === "Pending").length,
+      "In Progress": visibleIssues.filter((i) => i.status === "In Progress").length,
+      "Pending Verification": visibleIssues.filter((i) => i.status === "Pending Verification").length,
+      "Rework Required": visibleIssues.filter((i) => i.status === "Rework Required" || i.status === "Rejected").length,
+      Resolved: visibleIssues.filter((i) => i.status === "Resolved" || i.status === "Completed").length
     };
-  }, [issues]);
+  }, [visibleIssues]);
 
   // Filtered & Sorted issues
   const filteredIssues = useMemo(() => {
-    const list = issues.filter((issue) => {
+    const list = visibleIssues.filter((issue) => {
       // Status filter
       if (selectedStatus !== "All") {
         if (selectedStatus === "Resolved") {
           if (issue.status !== "Resolved" && issue.status !== "Completed") return false;
+        } else if (selectedStatus === "Rework Required") {
+          if (issue.status !== "Rework Required" && issue.status !== "Rejected") return false;
         } else if (issue.status.toLowerCase() !== selectedStatus.toLowerCase()) {
           return false;
         }
@@ -104,21 +112,13 @@ export default function AuthorityIssuesScreen() {
       }
       return 0;
     });
-  }, [issues, selectedStatus, selectedCategory, selectedDepartment, searchTerm, sortBy]);
+  }, [visibleIssues, selectedStatus, selectedCategory, selectedDepartment, searchTerm, sortBy]);
 
   // The active issue object for modal (derived from latest state to preserve live updates)
   const activeModalIssue = useMemo(() => {
     if (!selectedIssueId) return null;
-    return issues.find((i) => i.id === selectedIssueId) || null;
-  }, [issues, selectedIssueId]);
-
-  // Handle status update directly from table selector
-  const handleStatusChange = (issueId, newStatus, newPercentage) => {
-    updateIssue(issueId, {
-      status: newStatus,
-      percentage: newPercentage
-    });
-  };
+    return visibleIssues.find((i) => i.id === selectedIssueId) || null;
+  }, [visibleIssues, selectedIssueId]);
 
   const handleResetFilters = () => {
     setSearchTerm("");
@@ -143,7 +143,7 @@ export default function AuthorityIssuesScreen() {
           <div>
             <h2>Civic Grievances Registry</h2>
             <p style={{ fontSize: 13, color: "var(--text-muted)", marginTop: 2 }}>
-              Showing {filteredIssues.length} of {issues.length} total municipal tickets in Ward R/South
+              Showing {filteredIssues.length} of {visibleIssues.length} municipal tickets available to your role in Ward R/South
             </p>
           </div>
           <button
@@ -232,7 +232,7 @@ export default function AuthorityIssuesScreen() {
 
           {/* Status Tabs */}
           <div className="filter-status-tabs">
-            {["All", "Pending", "In Progress", "Resolved", "Rejected"].map((st) => (
+            {["All", "Pending", "In Progress", "Pending Verification", "Rework Required", "Resolved"].map((st) => (
               <button
                 key={st}
                 type="button"
@@ -267,7 +267,6 @@ export default function AuthorityIssuesScreen() {
           {/* Desktop Table View */}
           <AuthorityIssueTable
             issues={filteredIssues}
-            onStatusChange={handleStatusChange}
             onSelectIssue={(issue) => setSelectedIssueId(issue.id)}
           />
 
@@ -277,7 +276,6 @@ export default function AuthorityIssuesScreen() {
               <AuthorityIssueCard
                 key={issue.id}
                 issue={issue}
-                onStatusChange={handleStatusChange}
                 onSelectIssue={(i) => setSelectedIssueId(i.id)}
               />
             ))}

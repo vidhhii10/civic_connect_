@@ -30,6 +30,7 @@ import AuthorityDashboard from "./pages/authority/AuthorityDashboard";
 import AuthorityIssuesScreen from "./pages/authority/AuthorityIssuesScreen";
 import AuthorityMapScreen from "./pages/authority/AuthorityMapScreen";
 import AuthorityAnalyticsScreen from "./pages/authority/AuthorityAnalyticsScreen";
+import AuthorityLoginScreen from "./pages/authority/AuthorityLoginScreen";
 
 function CitizenLayout() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -84,9 +85,12 @@ export default function App() {
             <Route path="/login" element={<LoginScreen />} />
             <Route path="/signup" element={<LoginScreen initialMode="signup" />} />
 
+            <Route path="/authority/login" element={<AuthorityLoginScreen />} />
+
             {/* Authority Routes - full-width desktop command layout */}
             <Route path="/authority" element={<AuthorityLayout />}>
-              <Route index element={<AuthorityDashboard />} />
+              <Route index element={<Navigate to="/authority/dashboard" replace />} />
+              <Route path="dashboard" element={<AuthorityDashboard />} />
               <Route path="issues" element={<AuthorityIssuesScreen />} />
               <Route path="map" element={<AuthorityMapScreen />} />
               <Route path="analytics" element={<AuthorityAnalyticsScreen />} />

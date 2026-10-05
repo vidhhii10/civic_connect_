@@ -2,7 +2,7 @@ import React from "react";
 import { MapPin, User, Calendar, AlertTriangle, Building, SlidersHorizontal } from "lucide-react";
 import ProgressBar from "../common/ProgressBar";
 
-export default function AuthorityIssueCard({ issue, onStatusChange, onSelectIssue }) {
+export default function AuthorityIssueCard({ issue, onSelectIssue }) {
   const formattedDate = new Date(issue.timestamp).toLocaleDateString("en-IN", {
     day: "numeric",
     month: "short",
@@ -15,15 +15,6 @@ export default function AuthorityIssueCard({ issue, onStatusChange, onSelectIssu
     if (s.includes("progress")) return "status-select-progress";
     if (s.includes("rejected")) return "status-select-rejected";
     return "status-select-pending";
-  };
-
-  const handleSelectChange = (newStatus) => {
-    let percentage = 0;
-    if (newStatus === "Resolved" || newStatus === "Completed") percentage = 100;
-    else if (newStatus === "In Progress") percentage = 50;
-    else percentage = 0;
-
-    onStatusChange(issue.id, newStatus, percentage);
   };
 
   const prio = issue.priority || "Medium";
@@ -70,16 +61,9 @@ export default function AuthorityIssueCard({ issue, onStatusChange, onSelectIssu
       </div>
 
       <div className="mobile-card-actions" onClick={(e) => e.stopPropagation()}>
-        <select
-          className={`table-status-select ${getStatusClass(issue.status)}`}
-          value={issue.status}
-          onChange={(e) => handleSelectChange(e.target.value)}
-        >
-          <option value="Pending">Pending</option>
-          <option value="In Progress">In Progress</option>
-          <option value="Resolved">Resolved</option>
-          <option value="Rejected">Rejected</option>
-        </select>
+        <span className={`table-status-select ${getStatusClass(issue.status)}`}>
+          {issue.status}
+        </span>
 
         <button
           type="button"

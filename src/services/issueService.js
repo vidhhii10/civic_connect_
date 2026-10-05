@@ -1,4 +1,4 @@
-import { INITIAL_ISSUES, INITIAL_USERS } from "./seedData";
+import { AUTHORITY_DEMO_ACCOUNTS, INITIAL_ISSUES, INITIAL_USERS } from "./seedData";
 
 const STORAGE_KEY_ISSUES = "civic_connect_issues_v1";
 const STORAGE_KEY_ACTIVE_USER = "civic_connect_active_user_v1";
@@ -195,7 +195,14 @@ export const issueService = {
     try {
       const stored = localStorage.getItem(STORAGE_KEY_ACTIVE_USER);
       if (stored) {
-        return JSON.parse(stored);
+        const user = JSON.parse(stored);
+        const authorityAccount = AUTHORITY_DEMO_ACCOUNTS.find(
+          (account) => account.email === user.email?.toLowerCase()
+        );
+        if (!authorityAccount) return user;
+        const normalizedAccount = { ...authorityAccount };
+        delete normalizedAccount.password;
+        return { ...user, ...normalizedAccount };
       }
     } catch (e) {}
     return INITIAL_USERS[0]; // Krish Patel
@@ -205,6 +212,12 @@ export const issueService = {
   setActiveUser: (user) => {
     try {
       localStorage.setItem(STORAGE_KEY_ACTIVE_USER, JSON.stringify(user));
+    } catch (e) {}
+  },
+
+  clearActiveUser: () => {
+    try {
+      localStorage.removeItem(STORAGE_KEY_ACTIVE_USER);
     } catch (e) {}
   },
 

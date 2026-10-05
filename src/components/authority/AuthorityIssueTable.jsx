@@ -2,22 +2,13 @@ import React from "react";
 import { MapPin, Calendar, SlidersHorizontal, AlertTriangle, Building } from "lucide-react";
 import ProgressBar from "../common/ProgressBar";
 
-export default function AuthorityIssueTable({ issues, onStatusChange, onSelectIssue }) {
+export default function AuthorityIssueTable({ issues, onSelectIssue }) {
   const getStatusClass = (status) => {
     const s = (status || "").toLowerCase();
     if (s.includes("resolved") || s.includes("completed")) return "status-select-completed";
     if (s.includes("progress")) return "status-select-progress";
     if (s.includes("rejected")) return "status-select-rejected";
     return "status-select-pending";
-  };
-
-  const handleSelectChange = (issueId, newStatus) => {
-    let percentage = 0;
-    if (newStatus === "Resolved" || newStatus === "Completed") percentage = 100;
-    else if (newStatus === "In Progress") percentage = 50;
-    else percentage = 0;
-
-    onStatusChange(issueId, newStatus, percentage);
   };
 
   return (
@@ -104,20 +95,10 @@ export default function AuthorityIssueTable({ issues, onStatusChange, onSelectIs
                     {issue.percentage}% resolved
                   </span>
                 </td>
-                <td onClick={(e) => e.stopPropagation()}>
-                  <div className="table-status-select-wrap">
-                    <select
-                      className={`table-status-select ${getStatusClass(issue.status)}`}
-                      value={issue.status}
-                      onChange={(e) => handleSelectChange(issue.id, e.target.value)}
-                      title="Update ticket status"
-                    >
-                      <option value="Pending">Pending</option>
-                      <option value="In Progress">In Progress</option>
-                      <option value="Resolved">Resolved</option>
-                      <option value="Rejected">Rejected</option>
-                    </select>
-                  </div>
+                <td>
+                  <span className={`table-status-select ${getStatusClass(issue.status)}`}>
+                    {issue.status}
+                  </span>
                 </td>
                 <td onClick={(e) => e.stopPropagation()}>
                   <button

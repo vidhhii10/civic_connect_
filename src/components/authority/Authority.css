@@ -143,6 +143,218 @@
   background-color: rgba(0, 0, 0, 0.15);
 }
 
+.authority-role-badge {
+  margin: 12px 0 0 46px;
+  color: var(--accent-cyan);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+.authority-signout-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 14px;
+  padding: 9px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+}
+
+.authority-signout-btn:hover {
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+.authority-login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  color: var(--text-primary);
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(56, 189, 248, 0.13), transparent 55%),
+    #0b0c0e;
+  font-family: var(--font-family);
+}
+
+.authority-login-panel {
+  width: min(100%, 420px);
+  padding: 30px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: rgba(20, 21, 24, 0.96);
+  box-shadow: 0 22px 70px rgba(0, 0, 0, 0.35);
+}
+
+.authority-login-brand,
+.authority-login-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.authority-login-brand {
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.authority-login-brand > div,
+.authority-login-heading > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.authority-login-brand strong {
+  color: #fff;
+  font-size: 16px;
+}
+
+.authority-login-brand span:not(.authority-login-mark),
+.authority-login-heading p {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.authority-login-mark {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 7px;
+  color: var(--accent-cyan);
+  background: rgba(56, 189, 248, 0.1);
+}
+
+.authority-login-heading {
+  margin: 24px 0;
+  color: var(--accent-cyan);
+}
+
+.authority-login-heading h1 {
+  margin: 0;
+  color: #fff;
+  font-size: 20px;
+}
+
+.authority-login-heading p {
+  margin: 0;
+}
+
+.authority-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.authority-login-form label {
+  margin-top: 5px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.authority-login-form input {
+  width: 100%;
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 5px;
+  background: #0d0e10;
+  color: #fff;
+  font: inherit;
+}
+
+.authority-login-form input:focus {
+  outline: 2px solid rgba(56, 189, 248, 0.45);
+  border-color: var(--accent-cyan);
+}
+
+.authority-login-submit,
+.authority-demo-logins button {
+  min-height: 40px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 5px;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.authority-login-submit {
+  margin-top: 8px;
+  border-color: #2f6783;
+  background: #24566f;
+}
+
+.authority-login-submit:hover {
+  background: #2d6b89;
+}
+
+.authority-demo-logins {
+  display: grid;
+  gap: 8px;
+  margin-top: 22px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.authority-demo-logins > span {
+  margin-bottom: 2px;
+  color: var(--text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.authority-demo-logins button {
+  background: #1a1c20;
+  color: var(--text-secondary);
+}
+
+.authority-demo-logins button:hover {
+  border-color: rgba(56, 189, 248, 0.4);
+  color: #fff;
+}
+
+.authority-login-error {
+  margin: 3px 0;
+  color: #f87171;
+  font-size: 12px;
+}
+
+.proof-upload-label {
+  display: block;
+  margin: 10px 0 6px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.proof-photo-preview {
+  display: block;
+  width: 100%;
+  max-height: 260px;
+  margin: 10px 0;
+  border: 1px solid var(--border-subtle);
+  border-radius: 5px;
+  object-fit: contain;
+  background: #0b0c0e;
+}
+
+.proof-review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
 .authority-officer-card {
   display: flex;
   align-items: center;

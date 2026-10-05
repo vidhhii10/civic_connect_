@@ -19,12 +19,16 @@ import {
   Shield
 } from "lucide-react";
 import { useIssues } from "../../context/IssueContext";
+import { useUser } from "../../context/UserContext";
 import { MUNICIPAL_DEPARTMENTS, FIELD_OFFICERS, ISSUE_PRIORITIES } from "../../services/seedData";
 
 const createId = (prefix) => `${prefix}-${Math.random().toString(36).substring(2, 9)}`;
 
 export default function AuthorityIssueModal({ issue, onClose }) {
   const { updateIssue } = useIssues();
+  const { currentUser } = useUser();
+  const isSupervisor = currentUser?.authorityRole === "supervisor";
+  const isFieldOfficer = currentUser?.authorityRole === "field_officer";
 
   // Local editable state initialized from issue
   const [status, setStatus] = useState(issue?.status || "Pending");
@@ -36,7 +40,14 @@ export default function AuthorityIssueModal({ issue, onClose }) {
     issue?.assignedOfficer || "Officer Rajesh Kadam"
   );
   const [newNote, setNewNote] = useState("");
-  const [authorName] = useState("Officer Rajesh Kadam (Ward R/South)");
+  const [authorName] = useState(currentUser?.name || "Authority Portal");
+  const [proofPhoto, setProofPhoto] = useState(
+    ["Rework Required", "Rejected"].includes(issue?.status) ? "" : issue?.proofPhoto || ""
+  );
+  const [proofNotes, setProofNotes] = useState(
+    ["Rework Required", "Rejected"].includes(issue?.status) ? "" : issue?.proofNotes || ""
+  );
+  const [reworkNote, setReworkNote] = useState("");
   const [feedback, setFeedback] = useState(null);
 
   if (!issue) return null;
@@ -49,32 +60,75 @@ export default function AuthorityIssueModal({ issue, onClose }) {
   const isBreached = (status !== "Resolved" && status !== "Completed") && diffHours > slaTargetHours;
   const remainingHours = Math.max(0, slaTargetHours - diffHours);
 
-  // Status Change Handler
-  const handleStatusChange = (newStatus) => {
+  const recordStatusChange = (newStatus, percentage, note) => {
     setStatus(newStatus);
-
-    let percentage = 0;
-    if (newStatus === "Resolved" || newStatus === "Completed") percentage = 100;
-    else if (newStatus === "In Progress") percentage = 50;
-    else percentage = 0;
-
     const historyEntry = {
       id: createId("sh"),
       timestamp: new Date().toISOString(),
       status: newStatus,
-      updatedBy: "Ward R/South Command",
-      note: `Ticket transitioned to ${newStatus}`
+      updatedBy: currentUser?.name || "Authority Portal",
+      note
     };
 
     const currentHistory = Array.isArray(issue.statusHistory) ? issue.statusHistory : [];
-
     updateIssue(issue.id, {
       status: newStatus,
       percentage,
       statusHistory: [...currentHistory, historyEntry]
     });
+  };
 
-    showFeedback(`Status updated to ${newStatus} (${percentage}%)`);
+  const handleAcceptWork = () => {
+    if (!isFieldOfficer || !["Pending", "Assigned"].includes(status)) return;
+    recordStatusChange("In Progress", 50, "Assigned work accepted by field officer");
+    showFeedback("Work accepted");
+  };
+
+  const handleProofPhotoChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setProofPhoto(String(reader.result || ""));
+    reader.readAsDataURL(file);
+  };
+
+  const handleProofSubmit = (event) => {
+    event.preventDefault();
+    if (!isFieldOfficer || !["In Progress", "Rework Required", "Rejected"].includes(status)) return;
+    if (!proofPhoto || !proofNotes.trim()) {
+      showFeedback("Add a proof photo and work notes before submitting");
+      return;
+    }
+    const historyEntry = {
+      id: createId("sh"),
+      timestamp: new Date().toISOString(),
+      status: "Pending Verification",
+      updatedBy: currentUser?.name || "Field Officer",
+      note: "Completion proof submitted for supervisor verification"
+    };
+    const currentHistory = Array.isArray(issue.statusHistory) ? issue.statusHistory : [];
+    updateIssue(issue.id, {
+      status: "Pending Verification",
+      percentage: 75,
+      proofPhoto,
+      proofNotes: proofNotes.trim(),
+      statusHistory: [...currentHistory, historyEntry]
+    });
+    setStatus("Pending Verification");
+    showFeedback("Proof submitted for verification");
+  };
+
+  const handleProofReview = (approved) => {
+    if (!isSupervisor || status !== "Pending Verification") return;
+    const nextStatus = approved ? "Resolved" : "Rework Required";
+    const note = approved
+      ? "Supervisor approved the submitted completion proof"
+      : `Supervisor requested rework${reworkNote.trim() ? `: ${reworkNote.trim()}` : ""}`;
+    recordStatusChange(nextStatus, approved ? 100 : 50, note);
+    if (!approved) {
+      updateIssue(issue.id, { reworkNote: reworkNote.trim() });
+    }
+    showFeedback(approved ? "Proof approved. Issue completed." : "Rework requested");
   };
 
   // Department Change Handler
@@ -92,7 +146,7 @@ export default function AuthorityIssueModal({ issue, onClose }) {
       id: createId("sh"),
       timestamp: new Date().toISOString(),
       status: status,
-      updatedBy: "Ward R/South Command",
+      updatedBy: currentUser?.name || "Authority Portal",
       note: `Reassigned to ${newDept} (${newOfficer})`
     };
 
@@ -114,7 +168,7 @@ export default function AuthorityIssueModal({ issue, onClose }) {
       id: createId("sh"),
       timestamp: new Date().toISOString(),
       status: status,
-      updatedBy: "Ward R/South Command",
+      updatedBy: currentUser?.name || "Authority Portal",
       note: `Field officer dispatched: ${newOfficer}`
     };
 
@@ -142,7 +196,7 @@ export default function AuthorityIssueModal({ issue, onClose }) {
       id: createId("note"),
       timestamp: new Date().toISOString(),
       author: authorName,
-      role: "Ward R/South Inspector",
+      role: currentUser?.role || "Authority Officer",
       text: newNote.trim()
     };
 
@@ -418,62 +472,81 @@ export default function AuthorityIssueModal({ issue, onClose }) {
 
           {/* RIGHT COLUMN: Operational Dispatch & Controls */}
           <div className="modal-control-column">
-            {/* Status Transition Control */}
-            <div className="modal-control-panel">
-              <h4 className="control-panel-title">
-                <RefreshCw size={15} color="var(--accent-cyan)" />
-                Status Management
-              </h4>
-              <p className="control-panel-desc">
-                Transition ticket status to update citizen dashboard and SLA tracking.
-              </p>
-
-              <div className="status-selector-buttons">
-                <button
-                  type="button"
-                  className={`status-btn btn-pending ${status === "Pending" ? "active" : ""}`}
-                  onClick={() => handleStatusChange("Pending")}
-                >
-                  <Clock size={15} />
-                  <span>Pending</span>
-                  <span className="status-pct-hint">0%</span>
-                </button>
-
-                <button
-                  type="button"
-                  className={`status-btn btn-progress ${status === "In Progress" ? "active" : ""}`}
-                  onClick={() => handleStatusChange("In Progress")}
-                >
-                  <RefreshCw size={15} />
-                  <span>In Progress</span>
-                  <span className="status-pct-hint">50%</span>
-                </button>
-
-                <button
-                  type="button"
-                  className={`status-btn btn-resolved ${
-                    status === "Resolved" || status === "Completed" ? "active" : ""
-                  }`}
-                  onClick={() => handleStatusChange("Resolved")}
-                >
-                  <CheckCircle2 size={15} />
-                  <span>Resolved</span>
-                  <span className="status-pct-hint">100%</span>
-                </button>
-
-                <button
-                  type="button"
-                  className={`status-btn btn-rejected ${status === "Rejected" ? "active" : ""}`}
-                  onClick={() => handleStatusChange("Rejected")}
-                >
-                  <XCircle size={15} />
-                  <span>Rejected</span>
-                  <span className="status-pct-hint">0%</span>
+            {isFieldOfficer && ["Pending", "Assigned"].includes(status) && (
+              <div className="modal-control-panel">
+                <h4 className="control-panel-title"><RefreshCw size={15} color="var(--accent-cyan)" /> Assigned Work</h4>
+                <p className="control-panel-desc">Accept this assignment to begin field work.</p>
+                <button type="button" className="btn btn-primary btn-block" onClick={handleAcceptWork}>
+                  Accept Assigned Work
                 </button>
               </div>
-            </div>
+            )}
+
+            {isFieldOfficer && ["In Progress", "Rework Required", "Rejected"].includes(status) && (
+              <form className="modal-control-panel" onSubmit={handleProofSubmit}>
+                <h4 className="control-panel-title"><CheckCircle2 size={15} color="var(--accent-cyan)" /> Submit Completion Proof</h4>
+                {issue.reworkNote && status !== "In Progress" && (
+                  <p className="control-panel-desc">Supervisor feedback: {issue.reworkNote}</p>
+                )}
+                <label className="proof-upload-label" htmlFor={`proof-photo-${issue.id}`}>Proof photo</label>
+                <input
+                  id={`proof-photo-${issue.id}`}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleProofPhotoChange}
+                  required={!proofPhoto}
+                />
+                {proofPhoto && <img className="proof-photo-preview" src={proofPhoto} alt="Work completion proof" />}
+                <label className="proof-upload-label" htmlFor={`proof-notes-${issue.id}`}>Work notes</label>
+                <textarea
+                  id={`proof-notes-${issue.id}`}
+                  className="modal-note-textarea"
+                  value={proofNotes}
+                  onChange={(event) => setProofNotes(event.target.value)}
+                  placeholder="Describe the completed repair"
+                  rows={4}
+                  required
+                />
+                <button type="submit" className="btn btn-primary btn-block">
+                  <Send size={14} /> Submit Proof for Review
+                </button>
+              </form>
+            )}
+
+            {isFieldOfficer && status === "Pending Verification" && (
+              <div className="modal-control-panel">
+                <h4 className="control-panel-title"><Clock size={15} color="var(--accent-cyan)" /> Awaiting Verification</h4>
+                <p className="control-panel-desc">Your proof has been sent to the ward supervisor.</p>
+              </div>
+            )}
+
+            {isSupervisor && status === "Pending Verification" && (
+              <div className="modal-control-panel">
+                <h4 className="control-panel-title"><Shield size={15} color="var(--accent-cyan)" /> Review Completion Proof</h4>
+                {issue.proofPhoto && <img className="proof-photo-preview" src={issue.proofPhoto} alt="Submitted work completion proof" />}
+                <p className="control-panel-desc">{issue.proofNotes || "No work notes were submitted."}</p>
+                <label className="proof-upload-label" htmlFor={`rework-note-${issue.id}`}>Rework request (optional)</label>
+                <textarea
+                  id={`rework-note-${issue.id}`}
+                  className="modal-note-textarea"
+                  value={reworkNote}
+                  onChange={(event) => setReworkNote(event.target.value)}
+                  placeholder="Explain what needs to be corrected"
+                  rows={3}
+                />
+                <div className="proof-review-actions">
+                  <button type="button" className="btn btn-primary" onClick={() => handleProofReview(true)}>
+                    <CheckCircle2 size={14} /> Approve Proof
+                  </button>
+                  <button type="button" className="btn btn-secondary" onClick={() => handleProofReview(false)}>
+                    <XCircle size={14} /> Request Rework
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Department Assignment */}
+            {isSupervisor && <>
             <div className="modal-control-panel">
               <h4 className="control-panel-title">
                 <Building size={15} color="var(--accent-cyan)" />
@@ -551,6 +624,7 @@ export default function AuthorityIssueModal({ issue, onClose }) {
                 ))}
               </div>
             </div>
+            </>}
 
             {/* SLA Tracker Box */}
             <div className={`modal-sla-box ${isBreached ? "sla-breached" : "sla-ok"}`}>

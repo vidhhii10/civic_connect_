@@ -30,6 +30,29 @@ export const INITIAL_USERS = [
   }
 ];
 
+export const AUTHORITY_DEMO_ACCOUNTS = [
+  {
+    id: "authority-supervisor",
+    name: "Chief Municipal Officer",
+    email: "supervisor@bmc.gov.in",
+    password: "Supervisor@123",
+    role: "Chief Municipal Officer (Supervisor)",
+    authorityRole: "supervisor",
+    address: "Ward R/South, Mumbai",
+    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=Supervisor"
+  },
+  {
+    id: "authority-field-officer",
+    name: "Officer Rajesh Kadam",
+    email: "officer.pwd@bmc.gov.in",
+    password: "Officer@123",
+    role: "Field Officer",
+    authorityRole: "field_officer",
+    address: "Ward R/South, Mumbai",
+    avatar: "https://api.dicebear.com/7.x/bottts/svg?seed=FieldOfficer"
+  }
+];
+
 export const ISSUE_CATEGORIES = [
   "Street Lights",
   "Exposed Wires",
